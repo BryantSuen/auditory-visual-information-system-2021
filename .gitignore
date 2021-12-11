@@ -1,0 +1,5 @@
+test_offline
+train
+__pycache__
+*.docx
+代码说明.txt
