@@ -2,3 +2,8 @@ numpy
 scipy
 soundfile
 ffmpeg-python
+torch
+torchvision
+torchaudio
+imageio
+tqdm
