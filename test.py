@@ -11,7 +11,7 @@ import models
 def test_task1(video_path):
     # 测试1
     result_dict = {}
-    model = models.resnet18
+    model = models.model_task1
     state_dict = torch.load("./models/task1resnet18.pkl")
     model.load_state_dict(state_dict)
     for file_name in os.listdir(video_path):
