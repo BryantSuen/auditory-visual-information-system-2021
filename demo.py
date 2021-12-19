@@ -6,6 +6,9 @@ import torch
 from dataset import video_dataset
 from utils import read_video
 
+a = torch.tensor([1,2,3,4,5,4])
+a[1] = 99
+print(a)
 resnet = models.resnet101(pretrained=True)
 
 resnet.fc = nn.Linear(in_features=2048, out_features= 10, bias = True)
@@ -15,8 +18,6 @@ video, video_fps = read_video("./train/ID1/014.mp4")
 print(video.shape)
 print(len(video))
 
-for idx in video:
-    print("ok")
 preprocess = transforms.Compose([
     transforms.ToTensor()
     ]

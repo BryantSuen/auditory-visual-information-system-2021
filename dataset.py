@@ -60,19 +60,19 @@ class video_dataset(torch.utils.data.Dataset):
             image = imageio.imread(os.path.join(self.path, self.images[idx]))
             if self.transform is not None:
                 image = self.transform(image)
-            label = torch.zeros(20)
-            label[labels[self.ids[idx]]] = 1
+            label = labels[self.ids[idx]]
             return {"image": image, "label": label}
         else:
             video, video_fps = read_video(self.path)
-            image = video[idx]
+            image = video[idx].copy()
             if self.transform is not None:
                 image = self.transform(image)
-            return {"image": image, "label": None}
+            return {"image": image}
 
 if __name__ == "__main__":
     preprocess = transforms.Compose([
         transforms.ToTensor()
     ])
-    ds = video_dataset("./train_processed","train", preprocess)
+    # ds = video_dataset("./train_processed","train", preprocess)
+    ds = video_dataset("./test_offline/task1/014.mp4", "test", preprocess)
     print(ds[0]["image"].shape)
