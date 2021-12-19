@@ -8,13 +8,13 @@ from dataset import video_dataset
 import models
 
 #- configs
-lr = 0.01
+lr = 0.007
 dataset_r = 0.8             # ratio of dataset for train
 momentum = 0.9
 weight_decay = 1e-4
-epoch = 30
+epoch = 50
 save = True
-batch_size_tr = 32
+batch_size_tr = 16
 batch_size_val = 16
 
 train_data_path = "./train_processed"
@@ -100,7 +100,7 @@ if __name__ == "__main__":
     tr_loader = DataLoader(tr_dataset, batch_size = batch_size_tr, shuffle=True, num_workers=16)
     val_loader = DataLoader(val_dataset, batch_size = batch_size_val, shuffle=True, num_workers=16)
     
-    model = models.resnet18
+    model = models.model_task1
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=momentum, weight_decay= weight_decay)
 
