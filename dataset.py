@@ -1,10 +1,11 @@
 import torch
 import os
-import imageio
 
 from torchvision import transforms
 from utils import read_video
 from PIL import Image
+from image_transforms import image_transforms
+import matplotlib.pyplot as plt
 
 labels = {
     "ID1": 0,
@@ -71,10 +72,22 @@ class video_dataset(torch.utils.data.Dataset):
                 image = self.transform(image)
             return {"image": image}
 
+
+def imshow(tensor, title=None):
+    image = tensor.cpu().clone()  # we clone the tensor to not do changes on it
+    image = image.squeeze(0)  # remove the fake batch dimension
+    show = transforms.ToPILImage()
+    image = show(image)
+    plt.imshow(image)
+    if title is not None:
+        plt.title(title)
+    plt.pause(5)
+
 if __name__ == "__main__":
     preprocess = transforms.Compose([
         transforms.ToTensor()
     ])
     # ds = video_dataset("./train_processed","train", preprocess)
-    ds = video_dataset("./test_offline/task1/014.mp4", "test", preprocess)
-    print(ds[0]["image"].shape)
+    ds = video_dataset("./test_offline/task1/035.mp4", "test", image_transforms)
+    
+    imshow(ds[50]["image"])

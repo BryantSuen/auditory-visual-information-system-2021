@@ -7,7 +7,7 @@ fc_in_features = model_task1.fc.in_features
 model_task1.fc = nn.Sequential(
     nn.Linear(fc_in_features, 256),
     nn.ReLU(),
-    nn.Dropout(0.3),
+    nn.Dropout(0.25),
     nn.Linear(256, 20),
     nn.LogSoftmax(dim=1)
     #nn.Softmax(0)  # crossentropy already has a softmax
