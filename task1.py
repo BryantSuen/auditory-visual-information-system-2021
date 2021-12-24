@@ -7,8 +7,18 @@ from torch.utils.data import DataLoader, random_split
 from dataset import video_dataset
 import models
 
-#- configs
-lr = 0.007
+#- configs  #70%
+#lr = 0.007
+#dataset_r = 0.8             # ratio of dataset for train
+#momentum = 0.9
+#weight_decay = 1e-4
+#epoch = 50
+#save = True
+#batch_size_tr = 16
+#batch_size_val = 16
+
+#new configs
+lr = 0.0075
 dataset_r = 0.8             # ratio of dataset for train
 momentum = 0.9
 weight_decay = 1e-4
@@ -23,6 +33,7 @@ model_path = "./models/task1resnet18.pkl"
 
 def train(tr_loader, val_loader, model, criterion, optimizer, epoch, save, model_path):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(device)
     model = model.to(device)
     best_acc = 0
     for i in range(epoch):
@@ -71,7 +82,7 @@ def classify_video(video_path, model):
         [0.229, 0.224, 0.225])
     ])
     _dataset = video_dataset(video_path, "test", _transform)
-    test_loader = DataLoader(_dataset, batch_size = 15, shuffle=False, num_workers=16)
+    test_loader = DataLoader(_dataset, batch_size = 15, shuffle=False, num_workers=8)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = model.to(device)
     result = torch.zeros(20)
@@ -97,8 +108,8 @@ if __name__ == "__main__":
     _dataset = video_dataset(train_data_path, "train", _transform)
     dataset_len = len(_dataset)
     tr_dataset, val_dataset = random_split(_dataset, [dataset_len // 10, dataset_len - dataset_len // 10])
-    tr_loader = DataLoader(tr_dataset, batch_size = batch_size_tr, shuffle=True, num_workers=16)
-    val_loader = DataLoader(val_dataset, batch_size = batch_size_val, shuffle=True, num_workers=16)
+    tr_loader = DataLoader(tr_dataset, batch_size = batch_size_tr, shuffle=True, num_workers=8)
+    val_loader = DataLoader(val_dataset, batch_size = batch_size_val, shuffle=True, num_workers=8)
     
     model = models.model_task1
     criterion = nn.CrossEntropyLoss()
