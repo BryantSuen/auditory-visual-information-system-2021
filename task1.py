@@ -6,13 +6,14 @@ from torch.utils.data import DataLoader, random_split
 
 from dataset import video_dataset
 import models
+from image_transforms import image_transforms
 
 #- configs
-lr = 0.007
+lr = 0.003
 dataset_r = 0.8             # ratio of dataset for train
 momentum = 0.9
 weight_decay = 1e-4
-epoch = 50
+epoch = 30
 save = True
 batch_size_tr = 16
 batch_size_val = 16
@@ -70,7 +71,7 @@ def classify_video(video_path, model):
         transforms.Normalize([0.485, 0.456, 0.406],
         [0.229, 0.224, 0.225])
     ])
-    _dataset = video_dataset(video_path, "test", _transform)
+    _dataset = video_dataset(video_path, "test", image_transforms)
     test_loader = DataLoader(_dataset, batch_size = 15, shuffle=False, num_workers=16)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = model.to(device)
@@ -89,19 +90,18 @@ def classify_video(video_path, model):
 
 if __name__ == "__main__":
     _transform = transforms.Compose([
-
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406],
         [0.229, 0.224, 0.225])
     ])
-    _dataset = video_dataset(train_data_path, "train", _transform)
+    _dataset = video_dataset(train_data_path, "train", image_transforms)
     dataset_len = len(_dataset)
     tr_dataset, val_dataset = random_split(_dataset, [dataset_len // 10, dataset_len - dataset_len // 10])
     tr_loader = DataLoader(tr_dataset, batch_size = batch_size_tr, shuffle=True, num_workers=16)
     val_loader = DataLoader(val_dataset, batch_size = batch_size_val, shuffle=True, num_workers=16)
     
     model = models.model_task1
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn.NLLLoss()
     optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=momentum, weight_decay= weight_decay)
 
     train(tr_loader, val_loader, model, criterion=criterion, optimizer = optimizer, epoch = epoch, save=save, model_path=model_path)

@@ -4,6 +4,7 @@ import imageio
 
 from torchvision import transforms
 from utils import read_video
+from PIL import Image
 
 labels = {
     "ID1": 0,
@@ -57,7 +58,7 @@ class video_dataset(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         if self.mode == "train":
-            image = imageio.imread(os.path.join(self.path, self.images[idx]))
+            image = Image.open(os.path.join(self.path, self.images[idx]))
             if self.transform is not None:
                 image = self.transform(image)
             label = labels[self.ids[idx]]
@@ -65,6 +66,7 @@ class video_dataset(torch.utils.data.Dataset):
         else:
             video, video_fps = read_video(self.path)
             image = video[idx].copy()
+            image = Image.fromarray(image)
             if self.transform is not None:
                 image = self.transform(image)
             return {"image": image}
