@@ -8,3 +8,4 @@ torchaudio
 imageio
 tqdm
 moviepy
+matplotlib
