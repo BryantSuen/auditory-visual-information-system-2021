@@ -6,22 +6,24 @@ import torch
 from dataset import video_dataset
 from utils import read_video
 
-a = torch.tensor([1,2,3,4,5,4])
-a[1] = 99
-print(a)
-resnet = models.resnet101(pretrained=True)
+mobilenet = models.mobilenet
 
-resnet.fc = nn.Linear(in_features=2048, out_features= 10, bias = True)
-print(resnet.fc)
-video, video_fps = read_video("./train/ID1/014.mp4")
+# a = torch.tensor([1,2,3,4,5,4])
+# a[1] = 99
+# print(a)
+# resnet = models.resnet101(pretrained=True)
 
-print(video.shape)
-print(len(video))
+# resnet.fc = nn.Linear(in_features=2048, out_features= 10, bias = True)
+# print(resnet.fc)
+# video, video_fps = read_video("./train/ID1/014.mp4")
 
-preprocess = transforms.Compose([
-    transforms.ToTensor()
-    ]
-)
+# print(video.shape)
+# print(len(video))
+
+# preprocess = transforms.Compose([
+#     transforms.ToTensor()
+#     ]
+# )
 
 
 # data = torch.stack([preprocess(video[0]), preprocess(video[1])], dim=0)

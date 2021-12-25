@@ -92,3 +92,7 @@ def MFCC(wav_file):
     filter_banks = mel_filter(pow_frames,N_FFT,sample_rate)
     mfcc = getmfcc(filter_banks)
     return mfcc
+
+if __name__ == "__main__":
+    mfcc = MFCC("./train_audio/ID1/020.wav")
+    print(mfcc.shape)
