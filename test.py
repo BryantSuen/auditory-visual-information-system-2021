@@ -4,6 +4,7 @@ import soundfile as sf
 import os,json
 import utils
 import torch
+from tqdm import tqdm
 
 from task1 import classify_video
 import models
@@ -14,7 +15,7 @@ def test_task1(video_path):
     model = models.model_task1
     state_dict = torch.load("./models/task1resnet18.pkl")
     model.load_state_dict(state_dict)
-    for file_name in os.listdir(video_path):
+    for file_name in tqdm(os.listdir(video_path)):
         ## 读取MP4文件中的视频,可以用任意其他的读写库
         # video_frames,video_fps = utils.read_video(os.path.join(video_path,file_name))
         result = classify_video(os.path.join(video_path,file_name), model)
