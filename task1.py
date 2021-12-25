@@ -27,7 +27,7 @@ lr = 0.01
 
 dataset_r = 0.8             # ratio of dataset for train
 momentum = 0.9
-weight_decay = 1e-5
+weight_decay = 5e-4
 epoch = 80
 save = True
 batch_size_tr = 32
@@ -116,7 +116,7 @@ if __name__ == "__main__":
     ])
     _dataset = video_dataset(train_data_path, "train", image_transforms)
     dataset_len = len(_dataset)
-    tr_dataset, val_dataset = random_split(_dataset, [dataset_len // 10, dataset_len - dataset_len // 10])
+    tr_dataset, val_dataset = random_split(_dataset, [int(dataset_len * dataset_r), dataset_len - int(dataset_len * dataset_r)])
     tr_loader = DataLoader(tr_dataset, batch_size = batch_size_tr, shuffle=True, num_workers=8)
     val_loader = DataLoader(val_dataset, batch_size = batch_size_val, shuffle=True, num_workers=8)
     
