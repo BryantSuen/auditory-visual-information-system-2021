@@ -16,6 +16,8 @@ FRAME_STRIDE = 0.01
 def sampling(wav_file):
     #采样：
     sample_rate, signal = scipy.io.wavfile.read(wav_file)
+    print("origin_shape")
+    print(signal.shape)
     #读取前3.5s
     original_signal = signal[0:int(TIME_LEN*sample_rate)]
     return sample_rate, original_signal
@@ -94,5 +96,5 @@ def MFCC(wav_file):
     return mfcc
 
 if __name__ == "__main__":
-    mfcc = MFCC("./train_audio/ID1/020.wav")
+    mfcc = MFCC("./train_audio/ID1/018.wav")
     print(mfcc.shape)

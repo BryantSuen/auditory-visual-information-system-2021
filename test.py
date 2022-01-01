@@ -7,6 +7,7 @@ import torch
 from tqdm import tqdm
 
 from task1 import classify_video
+from task2 import classify_audio
 import models
 
 def test_task1(video_path):
@@ -31,15 +32,19 @@ def test_task1(video_path):
 def test_task2(wav_path):
     # 测试2
     result_dict = {}
-    for file_name in os.listdir(wav_path):
+    model = models.CNN()
+    state_dict = torch.load("./models/task2_CNN.pkl")
+    model.load_state_dict(state_dict)
+    for file_name in tqdm(os.listdir(wav_path)):
         ## 读取WAV文件中的音频,可以用任意其他的读写库
-        audio_trace = utils.read_audio(os.path.join(wav_path,file_name),sr=44100)
+        # audio_trace = utils.read_audio(os.path.join(wav_path,file_name),sr=44100)
+        result = classify_audio(os.path.join(wav_path, file_name), model)
 
         ## 做一些处理
-        print('audio_trace have shape of:',audio_trace.shape,'and sampling rate of: 44100')
+        # print('audio_trace have shape of:',audio_trace.shape,'and sampling rate of: 44100')
 
         ## 返回一个ID
-        result_dict[file_name]=utils.ID_dict[1]
+        result_dict[file_name]=utils.ID_dict[result + 1]
 
     return result_dict
 
@@ -73,20 +78,22 @@ def test_task3(video_path,result_path):
 if __name__=='__main__':
 
     ## testing task1
-    with open('./test_offline/task1_gt.json','r') as f:
-        task1_gt = json.load(f)
-    task1_pred = test_task1('./test_offline/task1')
-    print("*********************")
-    print(task1_pred)
-    task1_acc = utils.calc_accuracy(task1_gt,task1_pred)
-    print('accuracy for task1 is:',task1_acc)   
+    # with open('./test_offline/task1_gt.json','r') as f:
+    #     task1_gt = json.load(f)
+    # task1_pred = test_task1('./test_offline/task1')
+    # print("*********************")
+    # print(task1_pred)
+    # task1_acc = utils.calc_accuracy(task1_gt,task1_pred)
+    # print('accuracy for task1 is:',task1_acc)   
 
     # ## testing task2
-    # with open('./test_offline/task2_gt.json','r') as f:
-    #     task2_gt = json.load(f)
-    # task2_pred = test_task2('./test_offline/task2')
-    # task2_acc = utils.calc_accuracy(task2_gt,task2_pred)
-    # print('accuracy for task2 is:',task2_acc)   
+    with open('./test_offline/task2_gt.json','r') as f:
+        task2_gt = json.load(f)
+    task2_pred = test_task2('./test_offline/task2')
+    print("*********************")
+    print(task2_pred)
+    task2_acc = utils.calc_accuracy(task2_gt,task2_pred)
+    print('accuracy for task2 is:',task2_acc)   
 
     # # testing task3
     # test_task3('./test_offline/task3','./test_offline/task3_estimate')
