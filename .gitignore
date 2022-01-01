@@ -4,6 +4,5 @@ __pycache__
 *.docx
 代码说明.txt
 train_processed
-models
 task2/train_audio
 train_audio

@@ -7,7 +7,6 @@ from torchaudio import transforms
 
 from dataset import audio_dataset
 import models
-from MFCC import MFCC
 from utils import read_audio
 
 #- configs
@@ -29,13 +28,13 @@ lr = 0.01
 dataset_r = 0.8             # ratio of dataset for train
 momentum = 0.9
 weight_decay = 5e-4
-epoch = 20
+epoch = 80
 save = True
 batch_size_tr = 32
 batch_size_val = 16
 
 train_data_path = "./train_audio/"
-model_path = "./models/task2_CNN.pkl"
+model_path = "./models/task2_resnet34.pkl"
 ##
 
 def train(tr_loader, val_loader, model, criterion, optimizer, epoch, save, model_path):
@@ -113,7 +112,7 @@ if __name__ == "__main__":
     tr_loader = DataLoader(tr_dataset, batch_size = batch_size_tr, shuffle=True, num_workers=8)
     val_loader = DataLoader(val_dataset, batch_size = batch_size_val, shuffle=True, num_workers=8)
     
-    model = models.CNN()
+    model = models.model_task2
     # model = models.model_task2
     criterion = nn.NLLLoss()
     # criterion = nn.CrossEntropyLoss()
