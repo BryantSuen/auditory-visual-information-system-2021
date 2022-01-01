@@ -32,8 +32,8 @@ def test_task1(video_path):
 def test_task2(wav_path):
     # 测试2
     result_dict = {}
-    model = models.CNN()
-    state_dict = torch.load("./models/task2_CNN.pkl")
+    model = models.model_task2
+    state_dict = torch.load("./models/task2_resnet34.pkl")
     model.load_state_dict(state_dict)
     for file_name in tqdm(os.listdir(wav_path)):
         ## 读取WAV文件中的音频,可以用任意其他的读写库
