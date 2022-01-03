@@ -4,6 +4,7 @@ import torch.nn.functional as F
 from torch.optim import optimizer
 from torchvision import transforms
 from torch.utils.data import DataLoader, random_split
+import numpy as np
 
 from dataset import video_dataset
 import models
@@ -34,10 +35,12 @@ batch_size_tr = 32
 batch_size_val = 16
 
 train_data_path = "./train_processed"
-model_path = "./models/task1resnet18.pkl"
+model_path = "./models/task1_resnet34.pkl"
 ##
 
 def train(tr_loader, val_loader, model, criterion, optimizer, epoch, save, model_path):
+    accuracy_list = []
+    loss_list = []
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(device)
     model = model.to(device)
@@ -76,7 +79,8 @@ def train(tr_loader, val_loader, model, criterion, optimizer, epoch, save, model
                 correct += pred.eq(label).sum()
                 total += image.size(0)
             acc = correct * 1.0 / total * 100
-
+        accuracy_list.append(acc)
+        loss_list.append(losses)
         print("epoch%d | loss: %.03f  accuracy : %.03f%%" % (i, losses, acc))
 
         if save == True and best_acc < acc:

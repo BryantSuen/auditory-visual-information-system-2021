@@ -3,6 +3,10 @@ from torch.nn.modules.conv import Conv2d
 from torchvision import models
 import torch.nn as nn
 import torch
+from sklearn.mixture import GaussianMixture
+import math
+import numpy as np
+import operator
 
 model_task1 = models.resnet34(pretrained= True)
 fc_in_features = model_task1.fc.in_features
@@ -72,6 +76,37 @@ class CNN(nn.Module):
         x = self.classifier(x)
         return x
 
+class GMM:
+    def __init__(self, gmm_class = 20):
+        self.gmms = []
+        self.gmm_class = gmm_class
+        self.labels = []
+
+    def train(self, speech, label):
+        self.labels.append(label)
+        gmm = GaussianMixture(self.gmm_class)
+        gmm.fit(speech)
+        self.gmms.append(gmm)
+
+    def score(self, gmm, speech):
+        return np.sum(gmm.score(speech))
+
+    def load(self, speech_path, id):
+        pass
+
+    def softmax(scores):
+        scores_sum = sum([math.exp(i) for i in scores])
+        score_max  = math.exp(max(scores))
+        return round(score_max / scores_sum, 3)
+
+    def predict(self, x):
+        scores = [self.score(gmm, x) / len(x) for gmm in self.gmms]
+        p = sorted(enumerate(scores), key=operator.itemgetter(1), reverse=True)
+        p = [(str(self.labels[i]), y, p[0][1] - y) for i, y in p]
+        result = [(self.labels[index], value) for (index, value) in enumerate(scores)]
+        p = max(result, key=operator.itemgetter(1))
+        softmax_score = self.softmax(scores)
+        return p[0], softmax_score
 
 if __name__ == "__main__":
     print(models.resnet18())
