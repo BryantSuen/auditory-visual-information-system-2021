@@ -10,4 +10,19 @@ homework for auditory-visual-information-system 2021
   ```python
   python train.py
   ```
+use resnet34 for prediction
+
+## TASK2
+- convert video to audio & downsample
+  ```python
+  python mp42wav.py
+  ```
+
+- train model
+  ```python
+  python task2.py
+  ```
+
+## TASK3
+powered by speechbrain 
   

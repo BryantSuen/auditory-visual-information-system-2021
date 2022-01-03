@@ -8,13 +8,14 @@ from tqdm import tqdm
 
 from task1 import classify_video
 from task2 import classify_audio
+from task3 import separator_3mix
 import models
 
 def test_task1(video_path):
     # 测试1
     result_dict = {}
     model = models.model_task1
-    state_dict = torch.load("./models/task1resnet18.pkl")
+    state_dict = torch.load("./models/task1_resnet34.pkl")
     model.load_state_dict(state_dict)
     for file_name in tqdm(os.listdir(video_path)):
         ## 读取MP4文件中的视频,可以用任意其他的读写库
@@ -60,45 +61,48 @@ def test_task3(video_path,result_path):
 
         video_frames,video_fps= utils.read_video(os.path.join(video_path,file_name))
         audio_trace = utils.read_audio(os.path.join(video_path,file_name),sr=44100)
+        ## save tmp file
+        if not os.path.exists("./tmp"):
+            os.mkdir("./tmp")
+        sf.write("./tmp/tmp.wav", audio_trace, 44100)
 
+        result = separator_3mix("./tmp/tmp.wav")
         ## 做一些处理
         print('video_frames have shape of:',video_frames.shape, 'and fps of:',video_fps)
         print('audio_trace have shape of:',audio_trace.shape,'and sampling rate of: 44100')
 
-        audio_left   = audio_trace[:,:1] + np.random.random(audio_trace[:,:1].shape)*0.001
-        audio_middle = audio_trace[:,:1] + np.random.random(audio_trace[:,:1].shape)*0.001
-        audio_right  = audio_trace[:,:1] + np.random.random(audio_trace[:,:1].shape)*0.001
-        
+        audio_left   = result[:, :, 0].T.numpy()
+        audio_middle   = result[:, :, 1].T.numpy()
+        audio_right   = result[:, :, 2].T.numpy()
+
         ## 输出结果到result_path
-        sf.write(os.path.join(result_path,idx+'_left.wav'),   audio_left, 44100)
-        sf.write(os.path.join(result_path,idx+'_middle.wav'), audio_middle, 44100)
-        sf.write(os.path.join(result_path,idx+'_right.wav'),  audio_right, 44100)
+        sf.write(os.path.join(result_path,idx+'_left.wav'),   audio_left, 8000)
+        sf.write(os.path.join(result_path,idx+'_middle.wav'), audio_middle, 8000)
+        sf.write(os.path.join(result_path,idx+'_right.wav'),  audio_right, 8000)
 
 
 if __name__=='__main__':
 
     ## testing task1
-    # with open('./test_offline/task1_gt.json','r') as f:
-    #     task1_gt = json.load(f)
-    # task1_pred = test_task1('./test_offline/task1')
+    with open('./test_offline/task1_gt.json','r') as f:
+        task1_gt = json.load(f)
+    task1_pred = test_task1('./test_offline/task1')
     # print("*********************")
     # print(task1_pred)
-    # task1_acc = utils.calc_accuracy(task1_gt,task1_pred)
-    # print('accuracy for task1 is:',task1_acc)   
+    task1_acc = utils.calc_accuracy(task1_gt,task1_pred)
+    print('accuracy for task1 is:',task1_acc)   
 
     # ## testing task2
     with open('./test_offline/task2_gt.json','r') as f:
         task2_gt = json.load(f)
     task2_pred = test_task2('./test_offline/task2')
-    print("*********************")
-    print(task2_pred)
     task2_acc = utils.calc_accuracy(task2_gt,task2_pred)
     print('accuracy for task2 is:',task2_acc)   
 
     # # testing task3
-    # test_task3('./test_offline/task3','./test_offline/task3_estimate')
-    # task3_SDR_blind = utils.calc_SDR('./test_offline/task3_gt','./test_offline/task3_estimate',permutaion=True)  # 盲分离
-    # print('average blind-sdr for task3 is:',task3_SDR_blind)
-    # task3_SDR_clear = utils.calc_SDR('./test_offline/task3_gt','./test_offline/task3_estimate',permutaion=False) # 定位分离
-    # print('average clear-sdr for task3 is:',task3_SDR_clear)
+    test_task3('./test_offline/task3','./test_offline/task3_estimate')
+    task3_SDR_blind = utils.calc_SDR('./test_offline/task3_gt','./test_offline/task3_estimate',permutaion=True)  # 盲分离
+    print('average blind-sdr for task3 is:',task3_SDR_blind)
+    task3_SDR_clear = utils.calc_SDR('./test_offline/task3_gt','./test_offline/task3_estimate',permutaion=False) # 定位分离
+    print('average clear-sdr for task3 is:',task3_SDR_clear)
 

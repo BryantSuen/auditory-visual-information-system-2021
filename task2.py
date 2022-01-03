@@ -10,7 +10,7 @@ import models
 from utils import read_audio
 
 #- configs
-lr = 0.01
+lr = 0.025
 
 #- configs  #70%
 #lr = 0.007
