@@ -3,6 +3,7 @@ import numpy as np
 import soundfile as sf
 import os,json
 import utils
+import nussl
 import torch
 from tqdm import tqdm
 
@@ -83,26 +84,26 @@ def test_task3(video_path,result_path):
 
 if __name__=='__main__':
 
-    ## testing task1
-    with open('./test_offline/task1_gt.json','r') as f:
-        task1_gt = json.load(f)
-    task1_pred = test_task1('./test_offline/task1')
-    # print("*********************")
-    # print(task1_pred)
-    task1_acc = utils.calc_accuracy(task1_gt,task1_pred)
-    print('accuracy for task1 is:',task1_acc)   
+    # ## testing task1
+    # with open('./test_offline/task1_gt.json','r') as f:
+    #     task1_gt = json.load(f)
+    # task1_pred = test_task1('./test_offline/task1')
+    # # print("*********************")
+    # # print(task1_pred)
+    # task1_acc = utils.calc_accuracy(task1_gt,task1_pred)
+    # print('accuracy for task1 is:',task1_acc)   
 
-    # ## testing task2
-    with open('./test_offline/task2_gt.json','r') as f:
-        task2_gt = json.load(f)
-    task2_pred = test_task2('./test_offline/task2')
-    task2_acc = utils.calc_accuracy(task2_gt,task2_pred)
-    print('accuracy for task2 is:',task2_acc)   
+    # # ## testing task2
+    # with open('./test_offline/task2_gt.json','r') as f:
+    #     task2_gt = json.load(f)
+    # task2_pred = test_task2('./test_offline/task2')
+    # task2_acc = utils.calc_accuracy(task2_gt,task2_pred)
+    # print('accuracy for task2 is:',task2_acc)   
 
     # # testing task3
     test_task3('./test_offline/task3','./test_offline/task3_estimate')
-    task3_SDR_blind = utils.calc_SDR('./test_offline/task3_gt','./test_offline/task3_estimate',permutaion=True)  # 盲分离
-    print('average blind-sdr for task3 is:',task3_SDR_blind)
-    task3_SDR_clear = utils.calc_SDR('./test_offline/task3_gt','./test_offline/task3_estimate',permutaion=False) # 定位分离
-    print('average clear-sdr for task3 is:',task3_SDR_clear)
+    task3_SISDR_blind = utils.calc_SISDR('./test_offline/task3_gt','./test_offline/task3_estimate',permutaion=True)  # 盲分离
+    print('strength-averaged SISDR_blind for task3 is:',task3_SISDR_blind)
+    task3_SISDR_match = utils.calc_SISDR('./test_offline/task3_gt','./test_offline/task3_estimate',permutaion=False) # 定位分离
+    print('strength-averaged SISDR_match for task3 is: ',task3_SISDR_match)
 

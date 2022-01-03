@@ -1,8 +1,8 @@
 import os,ffmpeg
 import numpy as np
-import metrics
 import soundfile as sf
 import json
+import nussl
 
 ID_dict ={1:'ID1',2:'ID2',3:'ID3',4:'ID4',5:'ID5',6:'ID6',7:'ID7',8:'ID8',9:'ID9',10:'ID10'
          ,11:'ID11',12:'ID12',13:'ID13',14:'ID14',15:'ID15',16:'ID16',17:'ID17',18:'ID18',19:'ID19',20:'ID20'}
@@ -18,29 +18,36 @@ def calc_accuracy(gt_dict,pred_dict):
             correct+=1
     return correct/len(gt_dict)
 
-def calc_SDR(gt_dir,estimate_dir,permutaion=False):
-    ## 计算SDR指标
+def calc_SISDR(gt_dir,estimate_dir,permutaion=False):
+    ## 计算SISDR指标
     ## 输入:    gt_dir: ground-true文件路径，type=str 如： './test_offline/task3_gt'
     ##          estimate_dir: 估计结果文件路径，type=str 如： './test_offline/task3_estimate'
     ##          permutaion: 是否允许排序，如果是则计算盲分离指标, type=bool
-    ## 输出:    sdr指标均值, type=float
-    sdr_list = []
+    ## 输出:    si-sdr指标加权均值, type=float
+    si_sdr_list = []
     idx_set = set([x.split('_')[0] for x in os.listdir(gt_dir)])
+    idx_set = sorted(idx_set,key=lambda x: int(x))
     for file in idx_set:
-        gt_audio=[]
-        est_audio=[]
-        for appendix in ['_left.wav','_middle.wav','_right.wav']:
+        sources_list = []
+        estimates_list=[]
+        strength_list=[]
+        person_list=['_left.wav','_middle.wav','_right.wav']
+        for idx, appendix in enumerate(person_list):
             est_audio_temp = read_audio(os.path.join(estimate_dir,file+appendix))
             gt_audio_temp = read_audio(os.path.join(gt_dir,file+appendix))[:len(est_audio_temp)]
-            gt_audio.append(gt_audio_temp)
-            est_audio.append(est_audio_temp)
-        gt_audio = np.stack(gt_audio)
-        est_audio = np.stack(est_audio) 
-        sdr,isr,sir,sar,_ = metrics.bss_eval(gt_audio,est_audio,np.inf,np.inf,compute_permutation=permutaion)
-        sdr_list.append(sdr)
-    sdr = np.concatenate(sdr_list,axis=0)
-    return sdr.mean()
-       
+            strength_list.append((gt_audio_temp**2).sum()**(1/2))
+            sources_list.append(nussl.AudioSignal(audio_data_array=gt_audio_temp, sample_rate=44100))
+            estimates_list.append(nussl.AudioSignal(audio_data_array=est_audio_temp, sample_rate=44100))
+
+        new_bss = nussl.evaluation.BSSEvalScale(sources_list, estimates_list,compute_permutation=permutaion)
+        weight = np.stack(strength_list)
+        weight = (weight/weight.sum())*3   # weight should sum up to 3 because 3 audios are considered
+        scores = new_bss.evaluate()
+        for idx in range(len(sources_list)):
+            si_sdr_list.append(scores['source_%d'%idx]['SI-SDR'][0]*weight[idx])
+    si_sdr = np.stack(si_sdr_list)
+    return si_sdr.mean()
+
 def read_video(file):
     ## 读取文件中的视频
     ## 输入:    file: 文件名，type=str 如： './test_offline/task1/001.mp4'

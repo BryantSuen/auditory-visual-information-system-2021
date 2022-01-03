@@ -12,3 +12,4 @@ matplotlib
 python_speech_features
 librosa
 speechbrain
+nussl
